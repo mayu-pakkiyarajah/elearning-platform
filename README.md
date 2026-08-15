@@ -8,7 +8,7 @@ A Udemy/Coursera-style e-learning platform built with Spring Boot microservices 
 elearning-platform/
 ├── backend/
 │   ├── auth-service/        ← DONE (this milestone)
-│   ├── user-service/        ← next
+│   ├── user-service/        ← later
 │   ├── course-service/      ← next
 │   ├── enrollment-service/  ← later
 │   ├── quiz-service/        ← later
@@ -19,7 +19,7 @@ elearning-platform/
 │   ├── api-gateway/         ← later
 │   ├── config-server/       ← later
 │   └── discovery-server/    ← later (Eureka)
-├── frontend/                 ← Angular app (later)
+├── frontend/                 ← Angular app (Ongoing)
 ├── docs/                     ← architecture notes, ERDs, API contracts
 └── docker-compose.yml        ← grows as each service is added
 ```
@@ -33,7 +33,7 @@ elearning-platform/
 5. **quiz-service**, **review-service**, **certificate-service**
 6. **notification-service** (RabbitMQ consumer)
 7. **analytics-service**
-8. **frontend** (Angular) — starts consuming auth-service once it's stable
+8. **frontend** (Angular) — authservice finished, then course/enrollment/quiz/review/certificate flows
 
 Each service is independently buildable/runnable — you don't need the whole platform running to work on one service.
 
