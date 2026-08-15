@@ -1,6 +1,7 @@
 version: "3.9"
 
 services:
+  # Auth Service
   auth-mysql:
     image: mysql:8.4
     container_name: auth-mysql
@@ -39,11 +40,45 @@ services:
     ports:
       - "8081:8081"
 
+  # Course Service
+  course-mysql:
+    image: mysql:8.4
+    container_name: course-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: course_db
+      MYSQL_USER: course_user
+      MYSQL_PASSWORD: course_pass
+    ports:
+      - "3308:3306"
+    volumes:
+      - course_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  course-service:
+    build:
+      context: ./backend/course-service
+    container_name: course-service
+    restart: unless-stopped
+    depends_on:
+      course-mysql:
+        condition: service_healthy
+    environment:
+      DB_HOST: course-mysql
+      DB_PORT: 3306
+      DB_NAME: course_db
+      DB_USER: course_user
+      DB_PASSWORD: course_pass
+      JWT_SECRET: change-this-to-a-long-random-base64-secret-in-production-min-256-bits
+      CORS_ORIGINS: http://localhost:4200
+    ports:
+      - "8082:8082"
+
 volumes:
   auth_mysql_data:
-
-# As each new service is added (course-service, enrollment-service, ...):
-#   1. add a `<service>-mysql` block following the auth-mysql pattern (own DB per service)
-#   2. add a `<service>` block following the auth-service pattern
-#   3. later: replace direct port exposure with routing through api-gateway,
-#      and add discovery-server + config-server once those exist.
+  course_mysql_data:
