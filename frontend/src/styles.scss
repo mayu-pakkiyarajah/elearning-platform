@@ -1,0 +1,69 @@
+// ---- EduPath design tokens ----
+// Palette: indigo (focus/trust) + amber (progress/momentum) on a quiet off-white.
+// Not the AI-default cream+terracotta, near-black+neon, or broadsheet looks —
+// chosen for an education product: calm to read, warm accent to mark progress.
+:root {
+  --edu-ink: #1B1B2F;        // near-black text, slightly blue for warmth
+  --edu-indigo: #4338CA;     // primary brand / actions
+  --edu-indigo-dark: #312E81;
+  --edu-amber: #F5A524;      // progress / milestone accent
+  --edu-bg: #FAFAFC;         // page background
+  --edu-surface: #FFFFFF;
+  --edu-border: #E5E4F0;
+  --edu-muted: #6B6B85;
+
+  --font-display: 'Lexend', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  --bs-primary: var(--edu-indigo);
+  --bs-primary-rgb: 67, 56, 202;
+  --bs-body-font-family: var(--font-body);
+  --bs-body-color: var(--edu-ink);
+  --bs-body-bg: var(--edu-bg);
+  --bs-border-radius: 0.6rem;
+  --bs-border-radius-lg: 0.9rem;
+}
+
+@import "bootstrap/scss/bootstrap";
+
+body {
+  font-family: var(--font-body);
+  color: var(--edu-ink);
+  background-color: var(--edu-bg);
+}
+
+h1, h2, h3, h4, h5, h6,
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
+}
+
+.btn-primary {
+  background-color: var(--edu-indigo);
+  border-color: var(--edu-indigo);
+
+  &:hover, &:focus {
+    background-color: var(--edu-indigo-dark);
+    border-color: var(--edu-indigo-dark);
+  }
+}
+
+.text-amber { color: var(--edu-amber) !important; }
+.bg-amber   { background-color: var(--edu-amber) !important; }
+
+// Visible keyboard focus everywhere (accessibility floor)
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+.form-control:focus-visible {
+  outline: 2px solid var(--edu-amber);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

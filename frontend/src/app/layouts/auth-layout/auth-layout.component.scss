@@ -1,0 +1,36 @@
+.auth-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+
+  @media (min-width: 992px) {
+    grid-template-columns: 0.85fr 1fr;
+  }
+}
+
+.brand-panel {
+  background: linear-gradient(160deg, var(--edu-indigo) 0%, var(--edu-indigo-dark) 100%);
+  padding: 3rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.path-illustration {
+  max-width: 260px;
+  margin: 0 auto;
+
+  .node-label {
+    fill: rgba(255, 255, 255, 0.85);
+    font-family: var(--font-body);
+    font-size: 14px;
+  }
+}
+
+.form-panel {
+  padding: 2rem 1.5rem;
+  background-color: var(--edu-bg);
+}
+
+.form-panel-inner {
+  max-width: 420px;
+}

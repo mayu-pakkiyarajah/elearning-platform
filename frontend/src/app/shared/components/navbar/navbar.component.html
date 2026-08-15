@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
+  <div class="container">
+    <a class="navbar-brand font-display fw-semibold text-dark" routerLink="/dashboard">
+      Edu<span class="text-amber">Path</span>
+    </a>
+
+    <div class="d-flex align-items-center gap-3 ms-auto">
+      @if (authService.currentUser(); as user) {
+        <span class="text-muted small d-none d-sm-inline">
+          {{ user.firstName }} {{ user.lastName }}
+        </span>
+        <span class="badge rounded-pill text-bg-light border">
+          {{ user.roles[0].replace('ROLE_', '') }}
+        </span>
+        <button type="button" class="btn btn-outline-secondary btn-sm" (click)="logout()">
+          Log out
+        </button>
+      }
+    </div>
+  </div>
+</nav>

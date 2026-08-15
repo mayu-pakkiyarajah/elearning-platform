@@ -1,0 +1,23 @@
+<div class="py-3">
+  @if (authService.currentUser(); as user) {
+    <h1 class="font-display fs-2 mb-1">Welcome, {{ user.firstName }} 👋</h1>
+    <p class="text-muted">
+      You're logged in as <strong>{{ user.roles.join(', ') }}</strong>.
+      This is a placeholder — course-service and the real dashboard widgets land next.
+    </p>
+
+    <div class="card mt-4" style="max-width: 420px;">
+      <div class="card-body">
+        <h2 class="fs-6 text-muted text-uppercase mb-3">Session</h2>
+        <dl class="row mb-0 small">
+          <dt class="col-5">Email</dt>
+          <dd class="col-7">{{ user.email }}</dd>
+          <dt class="col-5">Roles</dt>
+          <dd class="col-7">{{ user.roles.join(', ') }}</dd>
+          <dt class="col-5">Instructor approved</dt>
+          <dd class="col-7">{{ user.instructorApproved ? 'Yes' : 'N/A / Pending' }}</dd>
+        </dl>
+      </div>
+    </div>
+  }
+</div>

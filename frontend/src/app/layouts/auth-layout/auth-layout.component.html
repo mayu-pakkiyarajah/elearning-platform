@@ -1,0 +1,40 @@
+<div class="auth-shell">
+  <section class="brand-panel d-none d-lg-flex flex-column justify-content-between">
+    <a routerLink="/" class="font-display fw-semibold fs-4 text-white text-decoration-none">
+      Edu<span class="text-amber">Path</span>
+    </a>
+
+    <div class="path-illustration" aria-hidden="true">
+      <svg viewBox="0 0 320 420" width="100%" role="presentation">
+        <path d="M40 380 C 40 300, 260 300, 260 220 S 60 140, 60 60"
+              fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2"
+              stroke-dasharray="2 10" stroke-linecap="round" />
+        <g class="node" transform="translate(40,380)">
+          <circle r="9" fill="#F5A524" />
+          <text x="20" y="5" class="node-label">Enroll</text>
+        </g>
+        <g class="node" transform="translate(260,220)">
+          <circle r="9" fill="#F5A524" />
+          <text x="20" y="5" class="node-label">Learn</text>
+        </g>
+        <g class="node" transform="translate(140,260)">
+          <circle r="7" fill="rgba(255,255,255,0.5)" />
+        </g>
+        <g class="node" transform="translate(60,60)">
+          <circle r="9" fill="#F5A524" />
+          <text x="20" y="5" class="node-label">Certify</text>
+        </g>
+      </svg>
+    </div>
+
+    <blockquote class="text-white-50 border-start border-2 ps-3 mb-0">
+      "Every course finished is a path someone else can follow."
+    </blockquote>
+  </section>
+
+  <section class="form-panel d-flex align-items-center justify-content-center">
+    <div class="form-panel-inner w-100">
+      <router-outlet />
+    </div>
+  </section>
+</div>
