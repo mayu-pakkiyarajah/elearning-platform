@@ -1,12 +1,19 @@
 <nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
   <div class="container">
-    <a class="navbar-brand font-display fw-semibold text-dark" routerLink="/dashboard">
+    <a class="navbar-brand font-display fw-semibold text-dark" routerLink="/courses">
       Edu<span class="text-amber">Path</span>
     </a>
 
     <div class="d-flex align-items-center gap-3 ms-auto">
+      <a routerLink="/courses" class="text-decoration-none text-muted small d-none d-sm-inline">Browse</a>
+
       @if (authService.currentUser(); as user) {
-        <span class="text-muted small d-none d-sm-inline">
+        @if (authService.hasRole('ROLE_INSTRUCTOR')) {
+          <a routerLink="/instructor/courses" class="text-decoration-none text-muted small d-none d-sm-inline">My Courses</a>
+        }
+        <a routerLink="/dashboard" class="text-decoration-none text-muted small d-none d-sm-inline">Dashboard</a>
+
+        <span class="text-muted small d-none d-md-inline">
           {{ user.firstName }} {{ user.lastName }}
         </span>
         <span class="badge rounded-pill text-bg-light border">
@@ -15,6 +22,9 @@
         <button type="button" class="btn btn-outline-secondary btn-sm" (click)="logout()">
           Log out
         </button>
+      } @else {
+        <a routerLink="/auth/login" class="btn btn-outline-secondary btn-sm">Log in</a>
+        <a routerLink="/auth/register" class="btn btn-primary btn-sm">Sign up</a>
       }
     </div>
   </div>

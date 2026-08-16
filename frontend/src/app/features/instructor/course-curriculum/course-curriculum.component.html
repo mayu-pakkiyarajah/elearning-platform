@@ -1,0 +1,117 @@
+<div>
+  @if (course(); as c) {
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h1 class="font-display fs-2 mb-1">{{ c.title }}</h1>
+        <p class="text-muted mb-0">Manage sections and lessons.</p>
+      </div>
+      <a [routerLink]="['/instructor/courses', c.id, 'edit']" class="btn btn-outline-secondary btn-sm">Edit details</a>
+    </div>
+  }
+
+  <app-alert type="error" [message]="errorMessage()" />
+
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else if (course()) {
+    @if (course(); as c) {
+    <div class="d-flex flex-column gap-3">
+      @for (section of c.sections; track section.id) {
+        <div class="card">
+          <div class="card-body">
+            @if (editingSectionId() === section.id) {
+              <form (ngSubmit)="submitEditSection(section)" [formGroup]="sectionForm" class="d-flex gap-2 mb-2">
+                <input type="text" class="form-control" formControlName="title" />
+                <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelAdd()">Cancel</button>
+              </form>
+            } @else {
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h2 class="fs-5 fw-semibold mb-0">{{ section.title }}</h2>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-secondary" (click)="startEditSection(section)">Rename</button>
+                  <button type="button" class="btn btn-outline-danger" (click)="deleteSection(section)">Delete</button>
+                </div>
+              </div>
+            }
+
+            @if (section.lessons.length > 0) {
+              <ul class="list-group list-group-flush mb-2">
+                @for (lesson of section.lessons; track lesson.id) {
+                  <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                    <span>
+                      <span class="badge text-bg-light border me-2">{{ lesson.contentType }}</span>
+                      {{ lesson.title }}
+                      @if (lesson.preview) {
+                        <span class="badge bg-amber text-dark ms-2">Preview</span>
+                      }
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteLesson(lesson.id)">
+                      Remove
+                    </button>
+                  </li>
+                }
+              </ul>
+            } @else {
+              <p class="text-muted small mb-2">No lessons yet.</p>
+            }
+
+            @if (addingLessonForSection() === section.id) {
+              <form (ngSubmit)="submitNewLesson(section)" [formGroup]="lessonForm" class="border rounded p-3 mt-2">
+                <div class="row g-2">
+                  <div class="col-12">
+                    <input type="text" class="form-control form-control-sm" formControlName="title" placeholder="Lesson title" />
+                  </div>
+                  <div class="col-6">
+                    <select class="form-select form-select-sm" formControlName="contentType">
+                      <option value="VIDEO">Video</option>
+                      <option value="DOCUMENT">Document</option>
+                      <option value="TEXT">Text</option>
+                    </select>
+                  </div>
+                  <div class="col-6">
+                    <input type="number" class="form-control form-control-sm" formControlName="durationSeconds" placeholder="Duration (sec)" />
+                  </div>
+                  <div class="col-12">
+                    <input type="text" class="form-control form-control-sm" formControlName="videoUrl" placeholder="Video URL (if applicable)" />
+                  </div>
+                  <div class="col-12 form-check">
+                    <input type="checkbox" class="form-check-input" id="preview-{{section.id}}" formControlName="preview" />
+                    <label class="form-check-label small" for="preview-{{section.id}}">Free preview lesson</label>
+                  </div>
+                  <div class="col-12 d-flex gap-2 mt-1">
+                    <button type="submit" class="btn btn-primary btn-sm">Add lesson</button>
+                    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelAdd()">Cancel</button>
+                  </div>
+                </div>
+              </form>
+            } @else {
+              <button type="button" class="btn btn-sm btn-outline-primary" (click)="startAddLesson(section.id)">
+                + Add lesson
+              </button>
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="text-muted">No sections yet — add your first one below.</p>
+      }
+
+      @if (addingSection()) {
+        <div class="card">
+          <div class="card-body">
+            <form (ngSubmit)="submitNewSection()" [formGroup]="sectionForm" class="d-flex gap-2">
+              <input type="text" class="form-control" formControlName="title" placeholder="Section title" />
+              <button type="submit" class="btn btn-primary">Add</button>
+              <button type="button" class="btn btn-outline-secondary" (click)="cancelAdd()">Cancel</button>
+            </form>
+          </div>
+        </div>
+      } @else {
+        <button type="button" class="btn btn-outline-primary" (click)="startAddSection()">+ Add section</button>
+      }
+    </div>
+    }
+  }
+</div>

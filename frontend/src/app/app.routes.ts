@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { roleGuard } from './core/guards/role.guard';
 import { AuthLayoutComponent } from './layouts/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layouts/main-layout/main-layout.component';
 
@@ -19,13 +20,28 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayoutComponent,
-    canActivate: [authGuard],
     children: [
-      { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
-      // course-list, course-detail, profile, etc. get added here as their
-      // own lazy-loaded routes once course-service exists.
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      // Public catalog — no login required to browse.
+      { path: 'courses', loadComponent: () => import('./features/courses/course-list/course-list.component').then(m => m.CourseListComponent) },
+      { path: 'courses/:slug', loadComponent: () => import('./features/courses/course-detail/course-detail.component').then(m => m.CourseDetailComponent) },
+
+      // Authenticated
+      { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+
+      // Instructor-only course management
+      {
+        path: 'instructor/courses',
+        canActivate: [authGuard, roleGuard(['ROLE_INSTRUCTOR'])],
+        children: [
+          { path: '', loadComponent: () => import('./features/instructor/my-courses/my-courses.component').then(m => m.MyCoursesComponent) },
+          { path: 'new', loadComponent: () => import('./features/instructor/course-form/course-form.component').then(m => m.CourseFormComponent) },
+          { path: ':id/edit', loadComponent: () => import('./features/instructor/course-form/course-form.component').then(m => m.CourseFormComponent) },
+          { path: ':id/curriculum', loadComponent: () => import('./features/instructor/course-curriculum/course-curriculum.component').then(m => m.CourseCurriculumComponent) },
+        ],
+      },
+
+      { path: '', redirectTo: 'courses', pathMatch: 'full' },
     ],
   },
-  { path: '**', redirectTo: 'dashboard' },
+  { path: '**', redirectTo: 'courses' },
 ];

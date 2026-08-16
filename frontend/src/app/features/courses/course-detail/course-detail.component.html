@@ -1,0 +1,103 @@
+<div>
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else if (notFound()) {
+    <div class="text-center py-5">
+      <h1 class="font-display fs-3 mb-2">Course not found</h1>
+      <p class="text-muted mb-4">It may have been unpublished or the link is wrong.</p>
+      <a routerLink="/courses" class="btn btn-primary">Back to catalog</a>
+    </div>
+  } @else if (course()) {
+    @if (course(); as c) {
+    <div class="row g-4">
+      <div class="col-lg-8">
+        @if (c.category) {
+          <span class="badge text-bg-light border mb-2">{{ c.category.name }}</span>
+        }
+        <h1 class="font-display fs-2 mb-2">{{ c.title }}</h1>
+        @if (c.subtitle) {
+          <p class="lead text-muted">{{ c.subtitle }}</p>
+        }
+
+        <div class="d-flex gap-3 text-muted small mb-4">
+          <span class="badge rounded-pill text-bg-light border">{{ c.level }}</span>
+          <span>{{ c.language }}</span>
+          <span>{{ totalLessons(c) }} lessons</span>
+        </div>
+
+        @if (c.description) {
+          <h2 class="fs-5 font-display mb-2">About this course</h2>
+          <p class="mb-4" style="white-space: pre-line;">{{ c.description }}</p>
+        }
+
+        <h2 class="fs-5 font-display mb-3">Curriculum</h2>
+        <div class="accordion" id="curriculum">
+          @for (section of c.sections; track section.id) {
+            <div class="accordion-item mb-2 border rounded">
+              <h3 class="accordion-header">
+                <button
+                  type="button"
+                  class="accordion-button"
+                  [class.collapsed]="expandedSectionId() !== section.id"
+                  (click)="toggleSection(section.id)"
+                >
+                  <span class="fw-semibold">{{ section.title }}</span>
+                  <span class="text-muted small ms-2">({{ section.lessons.length }} lessons)</span>
+                </button>
+              </h3>
+              @if (expandedSectionId() === section.id) {
+                <div class="accordion-collapse">
+                  <ul class="list-group list-group-flush">
+                    @for (lesson of section.lessons; track lesson.id) {
+                      <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                          @if (lesson.preview) {
+                            <span class="badge bg-amber text-dark me-2">Preview</span>
+                          } @else {
+                            <span class="text-muted me-2">🔒</span>
+                          }
+                          {{ lesson.title }}
+                        </span>
+                        @if (lesson.durationSeconds) {
+                          <span class="text-muted small">{{ formatDuration(lesson.durationSeconds) }}</span>
+                        }
+                      </li>
+                    }
+                  </ul>
+                </div>
+              }
+            </div>
+          } @empty {
+            <p class="text-muted">No curriculum published yet.</p>
+          }
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card sticky-top" style="top: 1rem;">
+          <div class="course-thumb-lg" [class.course-thumb-lg--placeholder]="!c.thumbnailUrl">
+            @if (c.thumbnailUrl) {
+              <img [src]="c.thumbnailUrl" [alt]="c.title" class="w-100 h-100 object-fit-cover" />
+            } @else {
+              <span class="font-display fs-1 text-white">{{ c.title.charAt(0) }}</span>
+            }
+          </div>
+          <div class="card-body">
+            <p class="fs-3 font-display fw-semibold mb-3">
+              {{ c.price === 0 ? 'Free' : ('$' + c.price) }}
+            </p>
+            <button type="button" class="btn btn-primary w-100 mb-2" disabled title="Enrollment coming soon">
+              Enroll now
+            </button>
+            <p class="text-muted small text-center mb-0">
+              Enrollment isn't wired up yet — coming with enrollment-service.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+  }
+</div>

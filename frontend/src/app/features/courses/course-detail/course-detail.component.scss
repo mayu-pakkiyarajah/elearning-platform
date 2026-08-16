@@ -1,0 +1,12 @@
+.course-thumb-lg {
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--bs-border-radius-lg) var(--bs-border-radius-lg) 0 0;
+  overflow: hidden;
+
+  &--placeholder {
+    background: linear-gradient(135deg, var(--edu-indigo), var(--edu-indigo-dark));
+  }
+}

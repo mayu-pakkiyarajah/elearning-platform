@@ -1,0 +1,75 @@
+<div>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="font-display fs-2 mb-1">My courses</h1>
+      <p class="text-muted mb-0">Everything you teach, drafts included.</p>
+    </div>
+    <a routerLink="/instructor/courses/new" class="btn btn-primary">+ New course</a>
+  </div>
+
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else if (courses().length === 0) {
+    <div class="text-center py-5 border rounded bg-white">
+      <p class="text-muted mb-3">You haven't created any courses yet.</p>
+      <a routerLink="/instructor/courses/new" class="btn btn-primary">Create your first course</a>
+    </div>
+  } @else {
+    <div class="table-responsive">
+      <table class="table align-middle bg-white">
+        <thead>
+          <tr class="text-muted small text-uppercase">
+            <th>Title</th>
+            <th>Status</th>
+            <th>Price</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (course of courses(); track course.id) {
+            <tr>
+              <td>
+                <div class="fw-semibold">{{ course.title }}</div>
+                <div class="text-muted small">{{ course.sections.length }} sections</div>
+              </td>
+              <td>
+                <span
+                  class="badge rounded-pill"
+                  [class.text-bg-success]="course.status === 'PUBLISHED'"
+                  [class.text-bg-secondary]="course.status !== 'PUBLISHED'"
+                >
+                  {{ course.status }}
+                </span>
+              </td>
+              <td>{{ course.price === 0 ? 'Free' : ('$' + course.price) }}</td>
+              <td class="text-end">
+                <div class="btn-group btn-group-sm">
+                  <a [routerLink]="['/instructor/courses', course.id, 'edit']" class="btn btn-outline-secondary">Edit</a>
+                  <a [routerLink]="['/instructor/courses', course.id, 'curriculum']" class="btn btn-outline-secondary">Curriculum</a>
+                  <button
+                    type="button"
+                    class="btn btn-outline-secondary"
+                    [disabled]="actioningId() === course.id"
+                    (click)="togglePublish(course)"
+                  >
+                    {{ course.status === 'PUBLISHED' ? 'Unpublish' : 'Publish' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-outline-danger"
+                    [disabled]="actioningId() === course.id"
+                    (click)="deleteCourse(course)"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

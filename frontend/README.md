@@ -48,33 +48,59 @@ src/app/
 ├── core/
 │   ├── guards/        authGuard, guestGuard, roleGuard
 │   ├── interceptors/  jwtInterceptor (attach token, silent refresh on 401)
-│   ├── models/        User, AuthResponse, etc. — mirror the backend DTOs exactly
-│   └── services/      AuthService, TokenStorageService
+│   ├── models/        User, Course, Section, Lesson, etc. — mirror backend DTOs exactly
+│   └── services/      AuthService, TokenStorageService, CourseService, SectionService,
+│                       LessonService, CategoryService
 ├── shared/
 │   └── components/    alert, navbar — reused across features
 ├── layouts/
 │   ├── auth-layout/    split-screen shell for login/register/forgot-password
-│   └── main-layout/    navbar + router-outlet for authenticated pages
+│   └── main-layout/    navbar + router-outlet for everything else
 └── features/
     ├── auth/
     │   ├── login/
     │   ├── register/
     │   └── forgot-password/
-    └── dashboard/       placeholder — proves the auth loop works end to end
+    ├── courses/                 public — no login required
+    │   ├── course-list/          catalog browse with search/filter/pagination
+    │   └── course-detail/        full detail page with curriculum accordion
+    ├── instructor/               requires ROLE_INSTRUCTOR (roleGuard)
+    │   ├── my-courses/            instructor's own courses, incl. drafts; publish/unpublish/delete
+    │   ├── course-form/           create/edit course metadata (reused for both)
+    │   └── course-curriculum/     add/rename/delete sections and lessons inline
+    └── dashboard/                placeholder — proves the auth loop works end to end
 ```
+
+## Routes
+
+| Path                                  | Guard                        | Notes                                  |
+|----------------------------------------|-------------------------------|------------------------------------------|
+| `/courses`                            | none                          | Public catalog                          |
+| `/courses/:slug`                      | none                          | Public course detail                    |
+| `/dashboard`                          | authGuard                     |                                          |
+| `/instructor/courses`                 | authGuard + roleGuard(INSTRUCTOR) | List own courses                    |
+| `/instructor/courses/new`             | authGuard + roleGuard(INSTRUCTOR) | Create course                       |
+| `/instructor/courses/:id/edit`        | authGuard + roleGuard(INSTRUCTOR) | Edit course metadata                |
+| `/instructor/courses/:id/curriculum`  | authGuard + roleGuard(INSTRUCTOR) | Manage sections/lessons             |
 
 ## What's next
 
-- `course-list` / `course-detail` features once `course-service` exists
+- Enrollment: the "Enroll now" button on course detail is currently disabled — wire it
+  up once `enrollment-service` exists
 - A real dashboard (enrolled courses, progress) replacing the placeholder
 - `reset-password` page (the route from the emailed link — not built yet, only
   `forgot-password` which requests the token)
-- Admin screens (user/course management) once `admin` concerns are decided
+- Admin screens (user/course/category management) once `admin` concerns are decided
+- File upload for course thumbnails/videos — currently just accepts a pasted URL
 
 ## Known trade-offs (portfolio-project scope, worth knowing about)
 
 - **Tokens live in `localStorage`** (see `TokenStorageService`), which is simple but
   readable by any JS on the page. A hardening step for a "real" deployment would move
   the refresh token to an httpOnly cookie set by the backend.
+- **`CourseService.getMineById()` fetches all of an instructor's courses and filters
+  client-side** — fine at small scale, but worth adding a dedicated
+  `GET /courses/mine/{id}` endpoint on the backend if instructors accumulate hundreds
+  of courses.
 - **No E2E or component tests yet** — Karma/Jasmine scaffolding is in place
   (`npm test`) but no specs have been written beyond the CLI defaults.

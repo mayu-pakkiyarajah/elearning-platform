@@ -1,0 +1,22 @@
+.course-card {
+  border-color: var(--edu-border);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(27, 27, 47, 0.08);
+  }
+}
+
+.course-thumb {
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;
+  overflow: hidden;
+
+  &--placeholder {
+    background: linear-gradient(135deg, var(--edu-indigo), var(--edu-indigo-dark));
+  }
+}
