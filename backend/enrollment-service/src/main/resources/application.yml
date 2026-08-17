@@ -1,0 +1,52 @@
+server:
+  port: ${SERVER_PORT:8083}
+
+spring:
+  application:
+    name: enrollment-service
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:enrollment_db}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: ${DB_USER:enrollment_user}
+    password: ${DB_PASSWORD:enrollment_pass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+    open-in-view: false
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+  api-docs:
+    path: /v3/api-docs
+
+app:
+  jwt:
+    # MUST match auth-service's app.jwt.secret — this service only verifies tokens.
+    secret: ${JWT_SECRET:change-this-to-a-long-random-base64-secret-in-production-min-256-bits}
+    issuer: elearning-auth-service
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
+  course-service:
+    base-url: ${COURSE_SERVICE_URL:http://localhost:8082}
+
+logging:
+  level:
+    com.elearning.enrollment: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
