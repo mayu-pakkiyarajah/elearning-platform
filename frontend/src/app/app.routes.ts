@@ -27,6 +27,7 @@ export const routes: Routes = [
 
       // Authenticated
       { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'learn/:slug', canActivate: [authGuard], loadComponent: () => import('./features/learning/lesson-viewer/lesson-viewer.component').then(m => m.LessonViewerComponent) },
 
       // Instructor-only course management
       {

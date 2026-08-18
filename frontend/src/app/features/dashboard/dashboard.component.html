@@ -1,23 +1,54 @@
 <div class="py-3">
   @if (authService.currentUser(); as user) {
     <h1 class="font-display fs-2 mb-1">Welcome, {{ user.firstName }} 👋</h1>
-    <p class="text-muted">
-      You're logged in as <strong>{{ user.roles.join(', ') }}</strong>.
-      This is a placeholder — course-service and the real dashboard widgets land next.
-    </p>
 
-    <div class="card mt-4" style="max-width: 420px;">
-      <div class="card-body">
-        <h2 class="fs-6 text-muted text-uppercase mb-3">Session</h2>
-        <dl class="row mb-0 small">
-          <dt class="col-5">Email</dt>
-          <dd class="col-7">{{ user.email }}</dd>
-          <dt class="col-5">Roles</dt>
-          <dd class="col-7">{{ user.roles.join(', ') }}</dd>
-          <dt class="col-5">Instructor approved</dt>
-          <dd class="col-7">{{ user.instructorApproved ? 'Yes' : 'N/A / Pending' }}</dd>
-        </dl>
-      </div>
-    </div>
+    @if (authService.hasRole('ROLE_STUDENT')) {
+      <p class="text-muted mb-4">Pick up where you left off.</p>
+
+      @if (isLoading()) {
+        <div class="text-center text-muted py-5">
+          <div class="spinner-border" role="status"></div>
+        </div>
+      } @else if (enrollments().length === 0) {
+        <div class="text-center py-5 border rounded bg-white">
+          <p class="text-muted mb-3">You haven't enrolled in any courses yet.</p>
+          <a routerLink="/courses" class="btn btn-primary">Browse courses</a>
+        </div>
+      } @else {
+        <div class="row g-3">
+          @for (enrollment of enrollments(); track enrollment.id) {
+            <div class="col-12 col-md-6 col-lg-4">
+              <div class="card h-100">
+                <div class="card-body d-flex flex-column">
+                  <h2 class="fs-6 fw-semibold mb-2">{{ enrollment.courseTitle }}</h2>
+
+                  @if (enrollment.status === 'COMPLETED') {
+                    <span class="badge text-bg-success align-self-start mb-2">Completed</span>
+                  }
+
+                  <div class="mt-auto">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                      <span>{{ enrollment.completedLessons }}/{{ enrollment.totalLessons }} lessons</span>
+                      <span>{{ enrollment.progressPercent }}%</span>
+                    </div>
+                    <div class="progress mb-3" style="height: 6px;">
+                      <div class="progress-bar bg-amber" [style.width.%]="enrollment.progressPercent"></div>
+                    </div>
+                    <a [routerLink]="['/learn', enrollment.courseSlug]" class="btn btn-outline-primary btn-sm w-100">
+                      {{ enrollment.status === 'COMPLETED' ? 'Review course' : 'Continue' }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    } @else if (authService.hasRole('ROLE_INSTRUCTOR')) {
+      <p class="text-muted mb-4">Manage what you teach.</p>
+      <a routerLink="/instructor/courses" class="btn btn-primary">Go to my courses</a>
+    } @else {
+      <p class="text-muted">You're logged in as {{ user.roles.join(', ') }}.</p>
+    }
   }
 </div>

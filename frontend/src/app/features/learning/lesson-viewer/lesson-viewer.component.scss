@@ -1,0 +1,36 @@
+.lesson-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  position: sticky;
+  top: 1rem;
+}
+
+.lesson-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid transparent;
+  border-radius: var(--bs-border-radius);
+  background: transparent;
+  font-size: 0.875rem;
+  color: var(--edu-ink);
+
+  &:hover {
+    background-color: var(--edu-bg);
+  }
+
+  &.active {
+    background-color: white;
+    border-color: var(--edu-border);
+    font-weight: 600;
+  }
+}
+
+.lesson-nav-check {
+  width: 1.25rem;
+  color: #198754;
+  flex-shrink: 0;
+}

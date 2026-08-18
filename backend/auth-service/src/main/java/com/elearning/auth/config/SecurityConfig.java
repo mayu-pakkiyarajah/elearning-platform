@@ -25,7 +25,7 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity // enables @PreAuthorize on controller/service methods
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 

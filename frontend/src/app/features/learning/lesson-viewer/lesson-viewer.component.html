@@ -1,0 +1,123 @@
+<div>
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else if (notEnrolled()) {
+    <div class="text-center py-5">
+      <h1 class="font-display fs-3 mb-2">You're not enrolled in this course yet</h1>
+      <p class="text-muted mb-4">Enroll from the course page to start learning.</p>
+      <a [routerLink]="['/courses', course()?.slug]" class="btn btn-primary">View course</a>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="text-center py-5">
+      <h1 class="font-display fs-3 mb-2">Something went wrong</h1>
+      <p class="text-muted mb-4">{{ errorMessage() }}</p>
+      <a routerLink="/courses" class="btn btn-primary">Back to catalog</a>
+    </div>
+  } @else if (course()) {
+    @if (course(); as c) {
+    @if (detail(); as d) {
+      <div class="mb-3">
+        <a [routerLink]="['/courses', c.slug]" class="text-decoration-none small text-muted">&larr; {{ c.title }}</a>
+      </div>
+
+      @if (d.enrollment.status === 'COMPLETED') {
+        <div class="alert bg-amber bg-opacity-25 border-0 mb-3">
+          🎉 You've completed this course!
+        </div>
+      }
+
+      <div class="mb-4">
+        <div class="d-flex justify-content-between small text-muted mb-1">
+          <span>Course progress</span>
+          <span>{{ d.enrollment.progressPercent }}%</span>
+        </div>
+        <div class="progress" style="height: 6px;">
+          <div class="progress-bar bg-amber" [style.width.%]="d.enrollment.progressPercent"></div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-lg-3">
+          <div class="lesson-sidebar">
+            @for (fl of flatLessons(); track fl.lesson.id) {
+              <button
+                type="button"
+                class="lesson-nav-item"
+                [class.active]="currentLesson()?.lesson?.id === fl.lesson.id"
+                (click)="selectLesson(fl.lesson.id)"
+              >
+                <span class="lesson-nav-check">
+                  {{ isCompleted(fl.lesson.id) ? '✓' : '' }}
+                </span>
+                <span class="text-truncate">{{ fl.lesson.title }}</span>
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="col-lg-9">
+          @if (currentLesson(); as current) {
+            <div class="card">
+              <div class="card-body">
+                <p class="text-muted small mb-1">{{ current.sectionTitle }}</p>
+                <h1 class="font-display fs-4 mb-3">{{ current.lesson.title }}</h1>
+
+                @switch (current.lesson.contentType) {
+                  @case ('VIDEO') {
+                    @if (current.lesson.videoUrl) {
+                      <video [src]="current.lesson.videoUrl" controls class="w-100 rounded mb-3" style="max-height: 480px; background: #000;"></video>
+                    } @else {
+                      <p class="text-muted">No video attached to this lesson yet.</p>
+                    }
+                  }
+                  @case ('TEXT') {
+                    <p style="white-space: pre-line;">{{ current.lesson.textContent || 'No content yet.' }}</p>
+                  }
+                  @case ('DOCUMENT') {
+                    @if (current.lesson.videoUrl) {
+                      <a [href]="current.lesson.videoUrl" target="_blank" rel="noopener" class="btn btn-outline-primary">
+                        Open document
+                      </a>
+                    } @else {
+                      <p class="text-muted">No document attached to this lesson yet.</p>
+                    }
+                  }
+                }
+
+                <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goToPrevious()">
+                    &larr; Previous
+                  </button>
+
+                  <button
+                    type="button"
+                    class="btn btn-sm"
+                    [class.btn-primary]="!isCompleted(current.lesson.id)"
+                    [class.btn-outline-success]="isCompleted(current.lesson.id)"
+                    [disabled]="isMarking()"
+                    (click)="toggleComplete()"
+                  >
+                    @if (isMarking()) {
+                      <span class="spinner-border spinner-border-sm"></span>
+                    } @else if (isCompleted(current.lesson.id)) {
+                      ✓ Completed
+                    } @else {
+                      Mark as complete
+                    }
+                  </button>
+
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goToNext()">
+                    Next &rarr;
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    }
+    }
+  }
+</div>

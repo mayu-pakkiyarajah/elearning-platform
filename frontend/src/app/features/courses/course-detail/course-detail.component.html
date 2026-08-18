@@ -53,9 +53,9 @@
                     @for (lesson of section.lessons; track lesson.id) {
                       <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>
-                          @if (lesson.preview) {
+                          @if (lesson.preview && enrollmentState() !== 'ENROLLED') {
                             <span class="badge bg-amber text-dark me-2">Preview</span>
-                          } @else {
+                          } @else if (!lesson.preview && enrollmentState() !== 'ENROLLED') {
                             <span class="text-muted me-2">🔒</span>
                           }
                           {{ lesson.title }}
@@ -88,12 +88,53 @@
             <p class="fs-3 font-display fw-semibold mb-3">
               {{ c.price === 0 ? 'Free' : ('$' + c.price) }}
             </p>
-            <button type="button" class="btn btn-primary w-100 mb-2" disabled title="Enrollment coming soon">
-              Enroll now
-            </button>
-            <p class="text-muted small text-center mb-0">
-              Enrollment isn't wired up yet — coming with enrollment-service.
-            </p>
+
+            @if (enrollError()) {
+              <div class="alert alert-danger py-2 small">{{ enrollError() }}</div>
+            }
+
+            @switch (enrollmentState()) {
+              @case ('CHECKING') {
+                <button type="button" class="btn btn-primary w-100" disabled>
+                  <span class="spinner-border spinner-border-sm"></span>
+                </button>
+              }
+              @case ('ENROLLED') {
+                @if (enrollment(); as e) {
+                  <div class="mb-2">
+                    <div class="d-flex justify-content-between small text-muted mb-1">
+                      <span>Your progress</span>
+                      <span>{{ e.progressPercent }}%</span>
+                    </div>
+                    <div class="progress" style="height: 6px;">
+                      <div class="progress-bar bg-amber" [style.width.%]="e.progressPercent"></div>
+                    </div>
+                  </div>
+                }
+                <a [routerLink]="['/learn', c.slug]" class="btn btn-primary w-100">
+                  {{ enrollment()?.progressPercent === 0 ? 'Start learning' : 'Continue learning' }}
+                </a>
+              }
+              @case ('NOT_ENROLLED') {
+                <button type="button" class="btn btn-primary w-100" [disabled]="isEnrolling()" (click)="enrollNow()">
+                  @if (isEnrolling()) {
+                    <span class="spinner-border spinner-border-sm me-2"></span> Enrolling…
+                  } @else {
+                    Enroll now
+                  }
+                </button>
+              }
+              @case ('NOT_APPLICABLE') {
+                @if (!authService.isLoggedIn()) {
+                  <a routerLink="/auth/login" class="btn btn-primary w-100">Log in to enroll</a>
+                  <p class="text-muted small text-center mb-0 mt-2">New here? <a routerLink="/auth/register">Sign up</a> as a student.</p>
+                } @else {
+                  <button type="button" class="btn btn-outline-secondary w-100" disabled title="Only student accounts can enroll">
+                    Enrollment is for students
+                  </button>
+                }
+              }
+            }
           </div>
         </div>
       </div>

@@ -63,12 +63,14 @@ src/app/
     │   └── forgot-password/
     ├── courses/                 public — no login required
     │   ├── course-list/          catalog browse with search/filter/pagination
-    │   └── course-detail/        full detail page with curriculum accordion
+    │   └── course-detail/        full detail page, curriculum accordion, live enroll button
+    ├── learning/                 requires login (authGuard)
+    │   └── lesson-viewer/         sidebar + content pane, mark-complete, auto-advance
     ├── instructor/               requires ROLE_INSTRUCTOR (roleGuard)
     │   ├── my-courses/            instructor's own courses, incl. drafts; publish/unpublish/delete
     │   ├── course-form/           create/edit course metadata (reused for both)
     │   └── course-curriculum/     add/rename/delete sections and lessons inline
-    └── dashboard/                placeholder — proves the auth loop works end to end
+    └── dashboard/                student: enrolled courses with progress; instructor: shortcut to My Courses
 ```
 
 ## Routes
@@ -76,8 +78,9 @@ src/app/
 | Path                                  | Guard                        | Notes                                  |
 |----------------------------------------|-------------------------------|------------------------------------------|
 | `/courses`                            | none                          | Public catalog                          |
-| `/courses/:slug`                      | none                          | Public course detail                    |
-| `/dashboard`                          | authGuard                     |                                          |
+| `/courses/:slug`                      | none                          | Public course detail, live enroll button|
+| `/learn/:slug`                        | authGuard                     | Lesson viewer — 404s to "not enrolled" if you haven't enrolled |
+| `/dashboard`                          | authGuard                     | Student: enrollments; instructor: shortcut |
 | `/instructor/courses`                 | authGuard + roleGuard(INSTRUCTOR) | List own courses                    |
 | `/instructor/courses/new`             | authGuard + roleGuard(INSTRUCTOR) | Create course                       |
 | `/instructor/courses/:id/edit`        | authGuard + roleGuard(INSTRUCTOR) | Edit course metadata                |
@@ -85,13 +88,14 @@ src/app/
 
 ## What's next
 
-- Enrollment: the "Enroll now" button on course detail is currently disabled — wire it
-  up once `enrollment-service` exists
-- A real dashboard (enrolled courses, progress) replacing the placeholder
+- A real dashboard widget for instructors (enrollment counts per course, using
+  enrollment-service's `GET /enrollments/course/{courseId}` roster endpoint)
 - `reset-password` page (the route from the emailed link — not built yet, only
   `forgot-password` which requests the token)
 - Admin screens (user/course/category management) once `admin` concerns are decided
 - File upload for course thumbnails/videos — currently just accepts a pasted URL
+- Certificates once `certificate-service` exists — the completion banner in the lesson
+  viewer is the natural hook point
 
 ## Known trade-offs (portfolio-project scope, worth knowing about)
 
@@ -102,5 +106,11 @@ src/app/
   client-side** — fine at small scale, but worth adding a dedicated
   `GET /courses/mine/{id}` endpoint on the backend if instructors accumulate hundreds
   of courses.
+- **The lesson viewer doesn't enforce locking server-side** — course-service returns
+  full lesson content (including `videoUrl`/`textContent`) regardless of enrollment;
+  only the UI hides non-preview lessons behind a 🔒 on the course detail page. A
+  determined user could read the raw API response. Real access control for paid
+  content would need course-service or a gateway to check enrollment before returning
+  lesson bodies — worth doing before this goes anywhere with real paid courses.
 - **No E2E or component tests yet** — Karma/Jasmine scaffolding is in place
   (`npm test`) but no specs have been written beyond the CLI defaults.
