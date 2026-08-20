@@ -4,4 +4,5 @@ export const environment = {
   authApiUrl: '/api/v1',
   courseApiUrl: '/api/v1',
   enrollmentApiUrl: '/api/v1',
+  quizApiUrl: '/api/v1',
 };

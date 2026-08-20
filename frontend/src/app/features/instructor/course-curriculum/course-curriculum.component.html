@@ -7,6 +7,9 @@
       </div>
       <a [routerLink]="['/instructor/courses', c.id, 'edit']" class="btn btn-outline-secondary btn-sm">Edit details</a>
     </div>
+    <div class="mb-3">
+      <a [routerLink]="['/instructor/courses', c.id, 'quizzes']" class="btn btn-outline-primary btn-sm">Manage quizzes &rarr;</a>
+    </div>
   }
 
   <app-alert type="error" [message]="errorMessage()" />

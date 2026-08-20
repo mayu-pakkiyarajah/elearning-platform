@@ -65,11 +65,13 @@ src/app/
     │   ├── course-list/          catalog browse with search/filter/pagination
     │   └── course-detail/        full detail page, curriculum accordion, live enroll button
     ├── learning/                 requires login (authGuard)
-    │   └── lesson-viewer/         sidebar + content pane, mark-complete, auto-advance
+    │   ├── lesson-viewer/         sidebar + content pane, mark-complete, auto-advance, quiz links
+    │   └── quiz-take/             answer questions, submit, see per-question correct/incorrect
     ├── instructor/               requires ROLE_INSTRUCTOR (roleGuard)
     │   ├── my-courses/            instructor's own courses, incl. drafts; publish/unpublish/delete
     │   ├── course-form/           create/edit course metadata (reused for both)
-    │   └── course-curriculum/     add/rename/delete sections and lessons inline
+    │   ├── course-curriculum/     add/rename/delete sections and lessons inline
+    │   └── quiz-manager/          create quizzes, add/remove questions with choices inline
     └── dashboard/                student: enrolled courses with progress; instructor: shortcut to My Courses
 ```
 
@@ -80,16 +82,19 @@ src/app/
 | `/courses`                            | none                          | Public catalog                          |
 | `/courses/:slug`                      | none                          | Public course detail, live enroll button|
 | `/learn/:slug`                        | authGuard                     | Lesson viewer — 404s to "not enrolled" if you haven't enrolled |
+| `/learn/:slug/quizzes/:quizId`        | authGuard                     | Take a quiz, see scored results         |
 | `/dashboard`                          | authGuard                     | Student: enrollments; instructor: shortcut |
 | `/instructor/courses`                 | authGuard + roleGuard(INSTRUCTOR) | List own courses                    |
 | `/instructor/courses/new`             | authGuard + roleGuard(INSTRUCTOR) | Create course                       |
 | `/instructor/courses/:id/edit`        | authGuard + roleGuard(INSTRUCTOR) | Edit course metadata                |
 | `/instructor/courses/:id/curriculum`  | authGuard + roleGuard(INSTRUCTOR) | Manage sections/lessons             |
+| `/instructor/courses/:id/quizzes`     | authGuard + roleGuard(INSTRUCTOR) | Manage quizzes/questions            |
 
 ## What's next
 
 - A real dashboard widget for instructors (enrollment counts per course, using
-  enrollment-service's `GET /enrollments/course/{courseId}` roster endpoint)
+  enrollment-service's `GET /enrollments/course/{courseId}` roster endpoint; quiz
+  pass rates, using quiz-service's `GET /quizzes/{id}/submissions`)
 - `reset-password` page (the route from the emailed link — not built yet, only
   `forgot-password` which requests the token)
 - Admin screens (user/course/category management) once `admin` concerns are decided
@@ -112,5 +117,8 @@ src/app/
   determined user could read the raw API response. Real access control for paid
   content would need course-service or a gateway to check enrollment before returning
   lesson bodies — worth doing before this goes anywhere with real paid courses.
+- **The quiz manager's "add choice" form is plain, unstyled radio buttons** rather
+  than a polished picker — functional but the least visually refined screen in the
+  app; worth a pass if this becomes a real demo.
 - **No E2E or component tests yet** — Karma/Jasmine scaffolding is in place
   (`npm test`) but no specs have been written beyond the CLI defaults.

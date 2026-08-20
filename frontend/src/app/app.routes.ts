@@ -28,6 +28,7 @@ export const routes: Routes = [
       // Authenticated
       { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
       { path: 'learn/:slug', canActivate: [authGuard], loadComponent: () => import('./features/learning/lesson-viewer/lesson-viewer.component').then(m => m.LessonViewerComponent) },
+      { path: 'learn/:slug/quizzes/:quizId', canActivate: [authGuard], loadComponent: () => import('./features/learning/quiz-take/quiz-take.component').then(m => m.QuizTakeComponent) },
 
       // Instructor-only course management
       {
@@ -38,6 +39,7 @@ export const routes: Routes = [
           { path: 'new', loadComponent: () => import('./features/instructor/course-form/course-form.component').then(m => m.CourseFormComponent) },
           { path: ':id/edit', loadComponent: () => import('./features/instructor/course-form/course-form.component').then(m => m.CourseFormComponent) },
           { path: ':id/curriculum', loadComponent: () => import('./features/instructor/course-curriculum/course-curriculum.component').then(m => m.CourseCurriculumComponent) },
+          { path: ':id/quizzes', loadComponent: () => import('./features/instructor/quiz-manager/quiz-manager.component').then(m => m.QuizManagerComponent) },
         ],
       },
 

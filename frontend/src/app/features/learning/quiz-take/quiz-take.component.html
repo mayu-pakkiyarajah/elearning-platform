@@ -1,0 +1,123 @@
+<div>
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else if (notEnrolled()) {
+    <div class="text-center py-5">
+      <h1 class="font-display fs-3 mb-2">You need to be enrolled to take this quiz</h1>
+      @if (courseSlug()) {
+        <a [routerLink]="['/courses', courseSlug()]" class="btn btn-primary">View course</a>
+      }
+    </div>
+  } @else if (errorMessage() && !quiz()) {
+    <div class="text-center py-5">
+      <p class="text-muted">{{ errorMessage() }}</p>
+    </div>
+  } @else if (quiz()) {
+    @if (quiz(); as q) {
+    @if (courseSlug()) {
+      <a [routerLink]="['/learn', courseSlug()]" class="text-decoration-none small text-muted d-inline-block mb-3">
+        &larr; Back to course
+      </a>
+    }
+
+    <h1 class="font-display fs-3 mb-1">{{ q.title }}</h1>
+    @if (q.description) {
+      <p class="text-muted mb-3">{{ q.description }}</p>
+    }
+    <p class="text-muted small mb-4">Passing score: {{ q.passingScorePercent }}% &middot; {{ q.questions.length }} questions</p>
+
+    @if (result(); as r) {
+      <div class="alert" [class.alert-success]="r.submission.passed" [class.alert-danger]="!r.submission.passed">
+        <strong>{{ r.submission.passed ? "You passed! 🎉" : "Not quite — try again." }}</strong>
+        Scored {{ r.submission.scorePercent }}% (attempt #{{ r.submission.attemptNumber }}).
+      </div>
+
+      <div class="d-flex flex-column gap-3 mb-4">
+        @for (question of q.questions; track question.id) {
+          <div class="card">
+            <div class="card-body">
+              <p class="fw-semibold mb-2">
+                {{ question.text }}
+                @if (wasCorrect(question.id)) {
+                  <span class="text-success">✓</span>
+                } @else {
+                  <span class="text-danger">✕</span>
+                }
+              </p>
+              <ul class="list-unstyled mb-0">
+                @for (choice of question.choices; track choice.id) {
+                  <li
+                    class="mb-1"
+                    [class.text-success]="choice.id === correctChoiceIdFor(question.id)"
+                    [class.fw-semibold]="choice.id === correctChoiceIdFor(question.id)"
+                    [class.text-decoration-line-through]="isSelected(question.id, choice.id) && choice.id !== correctChoiceIdFor(question.id)"
+                  >
+                    @if (isSelected(question.id, choice.id)) { → }
+                    {{ choice.text }}
+                    @if (choice.id === correctChoiceIdFor(question.id)) { (correct) }
+                  </li>
+                }
+              </ul>
+            </div>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="btn btn-outline-primary" (click)="retake()">Try again</button>
+    } @else {
+      <div class="d-flex flex-column gap-3 mb-4">
+        @for (question of q.questions; track question.id; let qi = $index) {
+          <div class="card">
+            <div class="card-body">
+              <p class="fw-semibold mb-2">{{ qi + 1 }}. {{ question.text }}</p>
+              <div class="d-flex flex-column gap-2">
+                @for (choice of question.choices; track choice.id) {
+                  <label class="d-flex align-items-center gap-2" style="cursor: pointer;">
+                    <input
+                      type="radio"
+                      [name]="'question-' + question.id"
+                      [checked]="isSelected(question.id, choice.id)"
+                      (change)="selectAnswer(question.id, choice.id)"
+                    />
+                    {{ choice.text }}
+                  </label>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      @if (errorMessage()) {
+        <div class="alert alert-danger">{{ errorMessage() }}</div>
+      }
+
+      <button type="button" class="btn btn-primary" [disabled]="isSubmitting()" (click)="submit()">
+        @if (isSubmitting()) {
+          <span class="spinner-border spinner-border-sm me-2"></span> Submitting…
+        } @else {
+          Submit ({{ answeredCount }}/{{ q.questions.length }} answered)
+        }
+      </button>
+    }
+
+    @if (pastAttempts().length > 0) {
+      <div class="mt-5">
+        <h2 class="fs-6 text-uppercase text-muted mb-2">Past attempts</h2>
+        <ul class="list-group">
+          @for (attempt of pastAttempts(); track attempt.id) {
+            <li class="list-group-item d-flex justify-content-between">
+              <span>Attempt #{{ attempt.attemptNumber }}</span>
+              <span [class.text-success]="attempt.passed" [class.text-danger]="!attempt.passed">
+                {{ attempt.scorePercent }}% — {{ attempt.passed ? 'Passed' : 'Failed' }}
+              </span>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+    }
+  }
+</div>

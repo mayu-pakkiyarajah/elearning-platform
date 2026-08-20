@@ -55,6 +55,20 @@
               </button>
             }
           </div>
+
+          @if (quizzes().length > 0) {
+            <div class="mt-4">
+              <p class="text-muted small text-uppercase mb-2">Quizzes</p>
+              <div class="d-flex flex-column gap-1">
+                @for (quiz of quizzes(); track quiz.id) {
+                  <a [routerLink]="['/learn', c.slug, 'quizzes', quiz.id]" class="lesson-nav-item">
+                    <span class="lesson-nav-check">📝</span>
+                    <span class="text-truncate">{{ quiz.title }}</span>
+                  </a>
+                }
+              </div>
+            </div>
+          }
         </div>
 
         <div class="col-lg-9">

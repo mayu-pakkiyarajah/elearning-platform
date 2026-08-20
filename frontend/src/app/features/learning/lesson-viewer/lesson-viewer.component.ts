@@ -3,8 +3,10 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Course, Lesson } from '../../../core/models/course.model';
 import { EnrollmentDetail } from '../../../core/models/enrollment.model';
+import { Quiz } from '../../../core/models/quiz.model';
 import { CourseService } from '../../../core/services/course.service';
 import { EnrollmentService } from '../../../core/services/enrollment.service';
+import { QuizService } from '../../../core/services/quiz.service';
 
 interface FlatLesson {
   lesson: Lesson;
@@ -22,6 +24,9 @@ export class LessonViewerComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private courseService = inject(CourseService);
   private enrollmentService = inject(EnrollmentService);
+  private quizService = inject(QuizService);
+
+  readonly quizzes = signal<Quiz[]>([]);
 
   readonly course = signal<Course | null>(null);
   readonly detail = signal<EnrollmentDetail | null>(null);
@@ -81,6 +86,11 @@ export class LessonViewerComponent implements OnInit {
           this.errorMessage.set('Could not load your progress for this course.');
         }
       },
+    });
+
+    this.quizService.listQuizzesForCourse(courseId).subscribe({
+      next: (quizzes) => this.quizzes.set(quizzes),
+      error: () => {}, // non-fatal — the lesson viewer still works without the quiz list
     });
   }
 

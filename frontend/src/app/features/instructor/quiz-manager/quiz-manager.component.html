@@ -1,0 +1,167 @@
+<div>
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h1 class="font-display fs-2 mb-1">Quizzes</h1>
+      <p class="text-muted mb-0">Build and manage quizzes for this course.</p>
+    </div>
+    <a routerLink="/instructor/courses" class="btn btn-outline-secondary btn-sm">Back to my courses</a>
+  </div>
+
+  <app-alert type="error" [message]="errorMessage()" />
+
+  @if (isLoading()) {
+    <div class="text-center text-muted py-5">
+      <div class="spinner-border" role="status"></div>
+    </div>
+  } @else {
+    <div class="d-flex flex-column gap-3">
+      @for (quiz of quizzes(); track quiz.id) {
+        <div class="card">
+          <div class="card-body">
+            @if (editingQuizId() === quiz.id) {
+              <form [formGroup]="quizForm" (ngSubmit)="submitEditQuiz(quiz)" class="row g-2 mb-2">
+                <div class="col-12">
+                  <input type="text" class="form-control" formControlName="title" placeholder="Quiz title" />
+                </div>
+                <div class="col-12">
+                  <textarea class="form-control" rows="2" formControlName="description" placeholder="Description"></textarea>
+                </div>
+                <div class="col-6 col-md-4">
+                  <label class="form-label small">Passing score %</label>
+                  <input type="number" min="0" max="100" class="form-control" formControlName="passingScorePercent" />
+                </div>
+                <div class="col-12 d-flex gap-2">
+                  <button type="submit" class="btn btn-primary btn-sm">Save</button>
+                  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelAll()">Cancel</button>
+                </div>
+              </form>
+            } @else {
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <h2 class="fs-5 fw-semibold mb-1">{{ quiz.title }}</h2>
+                  @if (quiz.description) {
+                    <p class="text-muted small mb-1">{{ quiz.description }}</p>
+                  }
+                  <span class="badge text-bg-light border me-2">{{ quiz.questionCount }} questions</span>
+                  <span class="badge text-bg-light border">Pass at {{ quiz.passingScorePercent }}%</span>
+                </div>
+                <div class="btn-group btn-group-sm">
+                  <button type="button" class="btn btn-outline-secondary" (click)="toggleExpand(quiz)">
+                    {{ expandedQuizId() === quiz.id ? 'Hide questions' : 'Manage questions' }}
+                  </button>
+                  <button type="button" class="btn btn-outline-secondary" (click)="startEditQuiz(quiz)">Edit</button>
+                  <button type="button" class="btn btn-outline-danger" (click)="deleteQuiz(quiz)">Delete</button>
+                </div>
+              </div>
+            }
+
+            @if (expandedQuizId() === quiz.id) {
+              <hr />
+              @if (isLoadingDetail()) {
+                <div class="text-center text-muted py-3">
+                  <div class="spinner-border spinner-border-sm" role="status"></div>
+                </div>
+              } @else if (expandedDetail()) {
+                @if (expandedDetail(); as detail) {
+                @if (detail.questions.length > 0) {
+                  <ol class="mb-3">
+                    @for (question of detail.questions; track question.id) {
+                      <li class="mb-2">
+                        <div class="d-flex justify-content-between align-items-start">
+                          <div>
+                            <strong>{{ question.text }}</strong>
+                            <span class="text-muted small">({{ question.points }} pt)</span>
+                            <ul class="mb-0 small">
+                              @for (choice of question.choices; track choice.id) {
+                                <li [class.text-success]="choice.correct" [class.fw-semibold]="choice.correct">
+                                  {{ choice.text }} @if (choice.correct) { ✓ }
+                                </li>
+                              }
+                            </ul>
+                          </div>
+                          <button type="button" class="btn btn-sm btn-outline-danger" (click)="deleteQuestion(question.id)">
+                            Remove
+                          </button>
+                        </div>
+                      </li>
+                    }
+                  </ol>
+                } @else {
+                  <p class="text-muted small">No questions yet.</p>
+                }
+
+                @if (addingQuestionForQuiz() === quiz.id) {
+                  <form [formGroup]="questionForm" (ngSubmit)="submitNewQuestion(quiz.id)" class="border rounded p-3">
+                    <div class="mb-2">
+                      <input type="text" class="form-control form-control-sm" formControlName="text" placeholder="Question text" />
+                    </div>
+                    <div class="mb-2" style="max-width: 120px;">
+                      <label class="form-label small">Points</label>
+                      <input type="number" min="1" class="form-control form-control-sm" formControlName="points" />
+                    </div>
+
+                    <label class="form-label small d-block">Choices (select the correct one)</label>
+                    <div formArrayName="choices" class="d-flex flex-column gap-2 mb-2">
+                      @for (choice of choiceControls.controls; track $index) {
+                        <div class="d-flex align-items-center gap-2">
+                          <input
+                            type="radio"
+                            name="correctIndex"
+                            [checked]="questionForm.value.correctIndex === $index"
+                            (change)="questionForm.patchValue({ correctIndex: $index })"
+                          />
+                          <input type="text" class="form-control form-control-sm" [formControlName]="$index" placeholder="Choice text" />
+                          @if (choiceControls.length > 2) {
+                            <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeChoiceField($index)">✕</button>
+                          }
+                        </div>
+                      }
+                    </div>
+                    <button type="button" class="btn btn-sm btn-outline-secondary mb-3" (click)="addChoiceField()">+ Add choice</button>
+
+                    <div class="d-flex gap-2">
+                      <button type="submit" class="btn btn-primary btn-sm">Add question</button>
+                      <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelAll()">Cancel</button>
+                    </div>
+                  </form>
+                } @else {
+                  <button type="button" class="btn btn-sm btn-outline-primary" (click)="startAddQuestion(quiz.id)">
+                    + Add question
+                  </button>
+                }
+                }
+              }
+            }
+          </div>
+        </div>
+      } @empty {
+        <p class="text-muted">No quizzes yet — add your first one below.</p>
+      }
+
+      @if (addingQuiz()) {
+        <div class="card">
+          <div class="card-body">
+            <form [formGroup]="quizForm" (ngSubmit)="submitNewQuiz()" class="row g-2">
+              <div class="col-12">
+                <input type="text" class="form-control" formControlName="title" placeholder="Quiz title" />
+              </div>
+              <div class="col-12">
+                <textarea class="form-control" rows="2" formControlName="description" placeholder="Description (optional)"></textarea>
+              </div>
+              <div class="col-6 col-md-4">
+                <label class="form-label small">Passing score %</label>
+                <input type="number" min="0" max="100" class="form-control" formControlName="passingScorePercent" />
+              </div>
+              <div class="col-12 d-flex gap-2">
+                <button type="submit" class="btn btn-primary btn-sm">Create quiz</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" (click)="cancelAll()">Cancel</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      } @else {
+        <button type="button" class="btn btn-outline-primary" (click)="startAddQuiz()">+ Add quiz</button>
+      }
+    </div>
+  }
+</div>
