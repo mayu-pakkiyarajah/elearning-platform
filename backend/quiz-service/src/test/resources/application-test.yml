@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:quizdb;MODE=MySQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    enabled: false
+
+app:
+  jwt:
+    secret: test-secret-key-for-unit-tests-only-not-for-production-use-1234567890
+    issuer: elearning-auth-service-test
+  cors:
+    allowed-origins: http://localhost:4200
+  course-service:
+    base-url: http://localhost:0
+  enrollment-service:
+    base-url: http://localhost:0

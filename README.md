@@ -8,7 +8,7 @@ A Udemy/Coursera-style e-learning platform built with Spring Boot microservices 
 elearning-platform/
 ├── backend/
 │   ├── auth-service/        ← DONE (this milestone)
-│   ├── user-service/        ← later
+│   ├── user-service/        ← next
 │   ├── course-service/      ← next
 │   ├── enrollment-service/  ← later
 │   ├── quiz-service/        ← later
@@ -19,7 +19,7 @@ elearning-platform/
 │   ├── api-gateway/         ← later
 │   ├── config-server/       ← later
 │   └── discovery-server/    ← later (Eureka)
-├── frontend/                 ← Angular app (Ongoing)
+├── frontend/                 ← Angular app (later)
 ├── docs/                     ← architecture notes, ERDs, API contracts
 └── docker-compose.yml        ← grows as each service is added
 ```
@@ -27,13 +27,16 @@ elearning-platform/
 ## Build order (recommended)
 
 1. **auth-service** ✅ — registration, login, JWT access + refresh tokens, roles, password reset
-2. **discovery-server** + **config-server** + **api-gateway** — wire services together
-3. **course-service** — courses, sections, lessons, categories
-4. **enrollment-service** — enrollments, progress tracking
-5. **quiz-service**, **review-service**, **certificate-service**
-6. **notification-service** (RabbitMQ consumer)
-7. **analytics-service**
-8. **frontend** (Angular) — authservice finished, then course/enrollment/quiz/review/certificate flows
+2. **frontend shell** ✅ — Angular login/register/forgot-password against auth-service, protected dashboard placeholder
+3. **course-service** ✅ — courses, sections, lessons, categories, JWT-verify-only security
+4. **frontend course features** ✅ — public catalog browse/detail, instructor course + curriculum management
+5. **enrollment-service** ✅ — enrollment, lesson progress, course completion; calls course-service via RestClient
+6. **frontend enrollment features** ✅ — enroll button, lesson viewer with progress, dashboard shows enrollments
+7. **quiz-service** ✅ — quizzes, questions, choices, submissions, scoring; calls course-service + enrollment-service
+8. **discovery-server** + **config-server** + **api-gateway** — wire services together
+9. **review-service**, **certificate-service**
+10. **notification-service** (RabbitMQ consumer)
+11. **analytics-service**
 
 Each service is independently buildable/runnable — you don't need the whole platform running to work on one service.
 

@@ -80,7 +80,7 @@ services:
 
   enrollment-mysql:
     image: mysql:8.4
-    container_name: enrollment-mysql
+    container_name: README.md
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root_pass
@@ -120,10 +120,56 @@ services:
     ports:
       - "8083:8083"
 
+  quiz-mysql:
+    image: mysql:8.4
+    container_name: quiz-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: quiz_db
+      MYSQL_USER: quiz_user
+      MYSQL_PASSWORD: quiz_pass
+    ports:
+      - "3310:3306"
+    volumes:
+      - quiz_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  quiz-service:
+    build:
+      context: ./backend/quiz-service
+    container_name: quiz-service
+    restart: unless-stopped
+    depends_on:
+      quiz-mysql:
+        condition: service_healthy
+      course-service:
+        condition: service_started
+      enrollment-service:
+        condition: service_started
+    environment:
+      DB_HOST: quiz-mysql
+      DB_PORT: 3306
+      DB_NAME: quiz_db
+      DB_USER: quiz_user
+      DB_PASSWORD: quiz_pass
+      # MUST match auth-service's JWT_SECRET above — this service only verifies tokens.
+      JWT_SECRET: change-this-to-a-long-random-base64-secret-in-production-min-256-bits
+      CORS_ORIGINS: http://localhost:4200
+      COURSE_SERVICE_URL: http://course-service:8082
+      ENROLLMENT_SERVICE_URL: http://enrollment-service:8083
+    ports:
+      - "8084:8084"
+
 volumes:
   auth_mysql_data:
   course_mysql_data:
   enrollment_mysql_data:
+  quiz_mysql_data:
 
 # As each new service is added (course-service, enrollment-service, ...):
 #   1. add a `<service>-mysql` block following the auth-mysql pattern (own DB per service)
