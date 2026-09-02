@@ -80,7 +80,7 @@ services:
 
   enrollment-mysql:
     image: mysql:8.4
-    container_name: README.md
+    container_name: enrollment-mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root_pass
@@ -165,11 +165,58 @@ services:
     ports:
       - "8084:8084"
 
+  certificate-mysql:
+    image: mysql:8.4
+    container_name: certificate-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_pass
+      MYSQL_DATABASE: certificate_db
+      MYSQL_USER: certificate_user
+      MYSQL_PASSWORD: certificate_pass
+    ports:
+      - "3311:3306"
+    volumes:
+      - certificate_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  certificate-service:
+    build:
+      context: ./backend/certificate-service
+    container_name: certificate-service
+    restart: unless-stopped
+    depends_on:
+      certificate-mysql:
+        condition: service_healthy
+      auth-service:
+        condition: service_started
+      enrollment-service:
+        condition: service_started
+    environment:
+      DB_HOST: certificate-mysql
+      DB_PORT: 3306
+      DB_NAME: certificate_db
+      DB_USER: certificate_user
+      DB_PASSWORD: certificate_pass
+      # MUST match auth-service's JWT_SECRET above — this service only verifies tokens.
+      JWT_SECRET: change-this-to-a-long-random-base64-secret-in-production-min-256-bits
+      CORS_ORIGINS: http://localhost:4200
+      AUTH_SERVICE_URL: http://auth-service:8081
+      ENROLLMENT_SERVICE_URL: http://enrollment-service:8083
+      FRONTEND_URL: http://localhost:4200
+    ports:
+      - "8085:8085"
+
 volumes:
   auth_mysql_data:
   course_mysql_data:
   enrollment_mysql_data:
   quiz_mysql_data:
+  certificate_mysql_data:
 
 # As each new service is added (course-service, enrollment-service, ...):
 #   1. add a `<service>-mysql` block following the auth-mysql pattern (own DB per service)
