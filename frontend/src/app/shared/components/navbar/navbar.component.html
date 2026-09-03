@@ -11,6 +11,9 @@
         @if (authService.hasRole('ROLE_INSTRUCTOR')) {
           <a routerLink="/instructor/courses" class="text-decoration-none text-muted small d-none d-sm-inline">My Courses</a>
         }
+        @if (authService.hasRole('ROLE_STUDENT')) {
+          <a routerLink="/certificates" class="text-decoration-none text-muted small d-none d-sm-inline">Certificates</a>
+        }
         <a routerLink="/dashboard" class="text-decoration-none text-muted small d-none d-sm-inline">Dashboard</a>
 
         <span class="text-muted small d-none d-md-inline">

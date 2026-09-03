@@ -72,7 +72,10 @@ src/app/
     │   ├── course-form/           create/edit course metadata (reused for both)
     │   ├── course-curriculum/     add/rename/delete sections and lessons inline
     │   └── quiz-manager/          create quizzes, add/remove questions with choices inline
-    └── dashboard/                student: enrolled courses with progress; instructor: shortcut to My Courses
+    ├── certificates/
+    │   ├── my-certificates/       requires login — download own PDFs, copy share links
+    │   └── certificate-verify/    PUBLIC — no login required, what a QR code/share link opens
+    └── dashboard/                student: enrolled courses with progress + certificate button; instructor: shortcut to My Courses
 ```
 
 ## Routes
@@ -81,9 +84,11 @@ src/app/
 |----------------------------------------|-------------------------------|------------------------------------------|
 | `/courses`                            | none                          | Public catalog                          |
 | `/courses/:slug`                      | none                          | Public course detail, live enroll button|
+| `/certificates/verify/:code`          | none                          | Public — what a certificate's QR code / share link opens |
 | `/learn/:slug`                        | authGuard                     | Lesson viewer — 404s to "not enrolled" if you haven't enrolled |
 | `/learn/:slug/quizzes/:quizId`        | authGuard                     | Take a quiz, see scored results         |
-| `/dashboard`                          | authGuard                     | Student: enrollments; instructor: shortcut |
+| `/certificates`                       | authGuard                     | Your own certificates — download, copy share link |
+| `/dashboard`                          | authGuard                     | Student: enrollments + certificate button; instructor: shortcut |
 | `/instructor/courses`                 | authGuard + roleGuard(INSTRUCTOR) | List own courses                    |
 | `/instructor/courses/new`             | authGuard + roleGuard(INSTRUCTOR) | Create course                       |
 | `/instructor/courses/:id/edit`        | authGuard + roleGuard(INSTRUCTOR) | Edit course metadata                |
@@ -99,8 +104,6 @@ src/app/
   `forgot-password` which requests the token)
 - Admin screens (user/course/category management) once `admin` concerns are decided
 - File upload for course thumbnails/videos — currently just accepts a pasted URL
-- Certificates once `certificate-service` exists — the completion banner in the lesson
-  viewer is the natural hook point
 
 ## Known trade-offs (portfolio-project scope, worth knowing about)
 
@@ -120,5 +123,9 @@ src/app/
 - **The quiz manager's "add choice" form is plain, unstyled radio buttons** rather
   than a polished picker — functional but the least visually refined screen in the
   app; worth a pass if this becomes a real demo.
+- **Certificate downloads go through a blob fetch + synthetic `<a click>`** (see
+  `MyCertificatesComponent.download`) since the browser needs to send the Bearer
+  token, which a plain `<a href>` can't do. The public verify page's PDF link is a
+  plain `<a href>` instead, since that endpoint needs no auth at all.
 - **No E2E or component tests yet** — Karma/Jasmine scaffolding is in place
   (`npm test`) but no specs have been written beyond the CLI defaults.

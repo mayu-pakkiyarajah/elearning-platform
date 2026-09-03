@@ -34,9 +34,23 @@
                     <div class="progress mb-3" style="height: 6px;">
                       <div class="progress-bar bg-amber" [style.width.%]="enrollment.progressPercent"></div>
                     </div>
-                    <a [routerLink]="['/learn', enrollment.courseSlug]" class="btn btn-outline-primary btn-sm w-100">
+                    <a [routerLink]="['/learn', enrollment.courseSlug]" class="btn btn-outline-primary btn-sm w-100 mb-2">
                       {{ enrollment.status === 'COMPLETED' ? 'Review course' : 'Continue' }}
                     </a>
+                    @if (enrollment.status === 'COMPLETED') {
+                      <button
+                        type="button"
+                        class="btn btn-primary btn-sm w-100"
+                        [disabled]="generatingCertFor() === enrollment.courseId"
+                        (click)="getCertificate(enrollment)"
+                      >
+                        @if (generatingCertFor() === enrollment.courseId) {
+                          <span class="spinner-border spinner-border-sm"></span>
+                        } @else {
+                          Get certificate
+                        }
+                      </button>
+                    }
                   </div>
                 </div>
               </div>

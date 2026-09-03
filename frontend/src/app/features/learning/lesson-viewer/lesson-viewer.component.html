@@ -23,8 +23,15 @@
       </div>
 
       @if (d.enrollment.status === 'COMPLETED') {
-        <div class="alert bg-amber bg-opacity-25 border-0 mb-3">
-          🎉 You've completed this course!
+        <div class="alert bg-amber bg-opacity-25 border-0 mb-3 d-flex justify-content-between align-items-center">
+          <span>🎉 You've completed this course!</span>
+          <button type="button" class="btn btn-sm btn-primary" [disabled]="isGeneratingCertificate()" (click)="getCertificate()">
+            @if (isGeneratingCertificate()) {
+              <span class="spinner-border spinner-border-sm"></span>
+            } @else {
+              Get certificate
+            }
+          </button>
         </div>
       }
 

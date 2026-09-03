@@ -25,8 +25,12 @@ export const routes: Routes = [
       { path: 'courses', loadComponent: () => import('./features/courses/course-list/course-list.component').then(m => m.CourseListComponent) },
       { path: 'courses/:slug', loadComponent: () => import('./features/courses/course-detail/course-detail.component').then(m => m.CourseDetailComponent) },
 
+      // Public certificate verification — anyone with the link/QR code, no login required.
+      { path: 'certificates/verify/:code', loadComponent: () => import('./features/certificates/certificate-verify/certificate-verify.component').then(m => m.CertificateVerifyComponent) },
+
       // Authenticated
       { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard.component').then(m => m.DashboardComponent) },
+      { path: 'certificates', canActivate: [authGuard], loadComponent: () => import('./features/certificates/my-certificates/my-certificates.component').then(m => m.MyCertificatesComponent) },
       { path: 'learn/:slug', canActivate: [authGuard], loadComponent: () => import('./features/learning/lesson-viewer/lesson-viewer.component').then(m => m.LessonViewerComponent) },
       { path: 'learn/:slug/quizzes/:quizId', canActivate: [authGuard], loadComponent: () => import('./features/learning/quiz-take/quiz-take.component').then(m => m.QuizTakeComponent) },
 

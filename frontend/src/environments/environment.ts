@@ -5,4 +5,5 @@ export const environment = {
   courseApiUrl: '/api/v1',
   enrollmentApiUrl: '/api/v1',
   quizApiUrl: '/api/v1',
+  certificateApiUrl: '/api/v1',
 };

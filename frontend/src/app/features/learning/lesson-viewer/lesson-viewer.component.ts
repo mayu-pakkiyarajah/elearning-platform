@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Course, Lesson } from '../../../core/models/course.model';
 import { EnrollmentDetail } from '../../../core/models/enrollment.model';
 import { Quiz } from '../../../core/models/quiz.model';
+import { CertificateService } from '../../../core/services/certificate.service';
 import { CourseService } from '../../../core/services/course.service';
 import { EnrollmentService } from '../../../core/services/enrollment.service';
 import { QuizService } from '../../../core/services/quiz.service';
@@ -22,11 +23,14 @@ interface FlatLesson {
 })
 export class LessonViewerComponent implements OnInit {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private courseService = inject(CourseService);
   private enrollmentService = inject(EnrollmentService);
   private quizService = inject(QuizService);
+  private certificateService = inject(CertificateService);
 
   readonly quizzes = signal<Quiz[]>([]);
+  readonly isGeneratingCertificate = signal(false);
 
   readonly course = signal<Course | null>(null);
   readonly detail = signal<EnrollmentDetail | null>(null);
@@ -152,5 +156,19 @@ export class LessonViewerComponent implements OnInit {
     if (index >= 0 && index < lessons.length - 1) {
       this.currentLessonId.set(lessons[index + 1].lesson.id);
     }
+  }
+
+  getCertificate(): void {
+    const course = this.course();
+    if (!course) return;
+
+    this.isGeneratingCertificate.set(true);
+    this.certificateService.generate(course.id).subscribe({
+      next: () => {
+        this.isGeneratingCertificate.set(false);
+        this.router.navigate(['/certificates']);
+      },
+      error: () => this.isGeneratingCertificate.set(false),
+    });
   }
 }

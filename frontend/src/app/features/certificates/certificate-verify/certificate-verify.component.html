@@ -1,0 +1,45 @@
+<div class="d-flex justify-content-center py-4">
+  <div style="max-width: 560px; width: 100%;">
+    @if (isLoading()) {
+      <div class="text-center text-muted py-5">
+        <div class="spinner-border" role="status"></div>
+      </div>
+    } @else if (notFound() || !result()?.valid) {
+      <div class="card border-danger">
+        <div class="card-body text-center py-5">
+          <p class="fs-1 mb-3">✕</p>
+          <h1 class="font-display fs-4 mb-2">Certificate not found</h1>
+          <p class="text-muted mb-4">This verification code doesn't match any issued certificate.</p>
+          <a routerLink="/courses" class="btn btn-outline-primary">Browse courses</a>
+        </div>
+      </div>
+    } @else if (result()?.valid) {
+      @if (result(); as r) {
+      <div class="card border-success">
+        <div class="card-body text-center py-5">
+          <p class="fs-1 mb-3 text-success">✓</p>
+          <h1 class="font-display fs-4 mb-1">Valid certificate</h1>
+          <p class="text-muted mb-4">This certificate was issued by EduPath.</p>
+
+          <div class="text-start bg-light rounded p-3 mb-4">
+            <dl class="row mb-0 small">
+              <dt class="col-5">Awarded to</dt>
+              <dd class="col-7 fw-semibold">{{ r.studentName }}</dd>
+              <dt class="col-5">Course</dt>
+              <dd class="col-7">{{ r.courseTitle }}</dd>
+              <dt class="col-5">Issued</dt>
+              <dd class="col-7">{{ r.issuedAt | date: 'mediumDate' }}</dd>
+              <dt class="col-5">Verification code</dt>
+              <dd class="col-7"><code>{{ r.verificationCode }}</code></dd>
+            </dl>
+          </div>
+
+          @if (pdfUrl()) {
+            <a [href]="pdfUrl()" target="_blank" rel="noopener" class="btn btn-primary">View certificate PDF</a>
+          }
+        </div>
+      </div>
+      }
+    }
+  </div>
+</div>

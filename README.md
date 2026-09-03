@@ -13,7 +13,7 @@ elearning-platform/
 │   ├── enrollment-service/  ← Done
 │   ├── quiz-service/        ← Done
 │   ├── review-service/      ← later
-│   ├── certificate-service/ ← Backend done, frontend later
+│   ├── certificate-service/ ← Done
 │   ├── notification-service/← later
 │   ├── analytics-service/   ← later
 │   ├── api-gateway/         ← later
